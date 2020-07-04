@@ -13,6 +13,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "express-validation": "^3.0.5",
+    "express-validator": "^6.6.0",
     "method-override": "^3.0.0",
     "mkdirp": "^1.0.4",
     "mongoose": "^5.9.21",
