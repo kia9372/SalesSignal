@@ -3,13 +3,13 @@ const Schema = mongoose.Schema;
 const uniqueString = require("unique-string");
 const bcrypte = require("bcrypt");
 
-const UserSchema = Schema({
+const ManagerSchema = Schema({
   name: { type: String, require: true },
   family: { type: String, require: true },
   userName: { type: String, require: true },
   phoneNumber: { type: String, require: true },
   password: { type: String, require: true },
-  isAdmin: { type: Boolean, require: true, default: false },
+  isAdmin: { type: Boolean, require: true, default: true },
   isDelete: { type: Boolean, default: false },
   isActive: { type: Boolean, default: false },
   avatar: { type: String, default: null },
@@ -19,7 +19,7 @@ const UserSchema = Schema({
   accountFail: { type: Number, default: 0 },
 });
 
-UserSchema.pre("save", function (next) {
+ManagerSchema.pre("save", function (next) {
   this.scurityStamp = uniqueString();
   if (this.isNew) {
     bcrypte.hash(this.password, bcrypte.genSaltSync(15), (err, hash) => {
@@ -32,8 +32,8 @@ UserSchema.pre("save", function (next) {
   }
 });
 
-UserSchema.methods.ValidationPassword = function (password) {
+ManagerSchema.methods.ValidationPassword = function (password) {
   return bcrypte.compareSync(password, this.password);
 };
 
-module.exports = mongoose.model("Users", UserSchema);
+module.exports = mongoose.model("Managers", ManagerSchema);

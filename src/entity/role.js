@@ -14,4 +14,5 @@ RoleSchema.pre("save", function (next) {
   next();
 });
 
+
 module.exports = mongoose.model("Roles", RoleSchema);

@@ -2,6 +2,10 @@ const BaseController = require("./BaseController");
 const Role = require("../../entity/role");
 
 module.exports = new (class RoleController extends BaseController {
+
+  /***
+   * Create Role
+   */
   async CreateRole(req, res, next) {
     let validationData = await this.ValidationAction(req, res);
     if (validationData[0]) {
@@ -11,7 +15,9 @@ module.exports = new (class RoleController extends BaseController {
     }
     return this.BadRerquest(res, validationData[1]);
   }
-
+  /***
+   * Delete Role
+   */
   async DeleteRole(req, res, next) {
     let validationData = await this.ValidationAction(req, res);
     if (validationData[0]) {
@@ -28,7 +34,9 @@ module.exports = new (class RoleController extends BaseController {
     }
     return this.BadRerquest(res, validationData[1]);
   }
-
+  /***
+   * Update Role
+   */
   async UpdateRole(req, res, next) {
     let validationData = await this.ValidationAction(req, res);
     if (validationData[0]) {
@@ -46,33 +54,37 @@ module.exports = new (class RoleController extends BaseController {
     }
     return await this.BadRerquest(res, validationData[1]);
   }
-
+  /***
+   * Get Role By Id
+   */
   async GetRoleById(req, res, next) {
     let validationData = await this.ValidationAction(req, res);
     if (validationData[0]) {
       let role = await Role.findById({
         _id: req.params.id,
-        isDelete: true,
-      });
+      })
+        .where("isDelete")
+        .equals(false)
+        .select('name description');
       if (role) {
         return this.OkObjectResult(res, role);
       }
-      return this.Notfound();
+      return this.Notfound(res);
     }
     return this.BadRerquest(res, validationData[1]);
   }
-
-  async GetAllRoles(req,res,next){
+  /***
+   * Get All Role
+   */
+  async GetAllRoles(req, res, next) {
     let validationData = await this.ValidationAction(req, res);
     if (validationData[0]) {
-      let role = await Role.find({});
+      let role = await Role.find({}).where("isDelete").equals(false).select('name description');
       if (role) {
         return this.OkObjectResult(res, role);
       }
-      return this.Notfound();
+      return this.Notfound(res);
     }
     return this.BadRerquest(res, validationData[1]);
   }
-
-
 })();
