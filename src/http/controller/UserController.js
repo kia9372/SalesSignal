@@ -1,7 +1,10 @@
 const BaseController = require("./BaseController");
 const User = require("../../entity/user");
 const fs = require("fs");
+const settingRepository = require("./Repository/SettingRepository");
 const Utilite = require("../../utilitie/utility");
+const UserRole = require("../../entity/userRole");
+const settingEnum = require("../../enums/settingtype");
 
 module.exports = new (class UserController extends BaseController {
   /***
@@ -11,7 +14,18 @@ module.exports = new (class UserController extends BaseController {
     let result = await this.ValidationAction(req, res);
     if (result[0]) {
       const user = new User({ ...req.body });
-      user.save();
+      user.save((error, user) => {
+        settingRepository
+          .GetSetting(settingEnum.REGISTER_SETTING)
+          .then((setting) => {
+            let userRole = new UserRole({
+              role: setting.adminRegister,
+              user: user._id,
+            });
+            userRole.save();
+          });
+      });
+
       return this.Ok(res);
     }
     return this.BadRerquest(res, result[1]);

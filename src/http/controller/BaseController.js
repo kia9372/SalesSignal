@@ -14,7 +14,7 @@ module.exports = class BaseController {
     });
   }
 
-   Ok(res) {
+  Ok(res) {
     return res.status(200).send({
       message: "عملیات با موفقیت انجام شد",
       statusCode: 200,
@@ -22,8 +22,17 @@ module.exports = class BaseController {
     });
   }
 
+  Result(res, message, data, success, statusCode) {
+    return res.status(statusCode).send({
+      message: message,
+      statusCode: statusCode,
+      data: data,
+      success: success,
+    });
+  }
+
   Notfound(res) {
-     res.status(200).send({
+    res.status(200).send({
       message: "رکورد مورد نظر یافت نشد",
       statusCode: 200,
       success: false,
@@ -33,7 +42,7 @@ module.exports = class BaseController {
   OkObjectResult(res, value) {
     return res.status(200).send({
       message: "عملیات با موفقیت انجام شد",
-      data:value,
+      data: value,
       statusCode: 200,
       success: true,
     });

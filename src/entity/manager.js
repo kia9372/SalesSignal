@@ -17,6 +17,8 @@ const ManagerSchema = Schema({
   locked: { type: Boolean, default: false },
   lockedDate: { type: Date, default: null },
   accountFail: { type: Number, default: 0 },
+},{
+  toJSON : { virtuals : true}
 });
 
 ManagerSchema.pre("save", function (next) {
@@ -31,7 +33,11 @@ ManagerSchema.pre("save", function (next) {
     next();
   }
 });
-
+ManagerSchema.virtual('userRole',{
+  ref : 'UserRole',
+  localField : '_id',
+  foreignField : 'user'
+})
 ManagerSchema.methods.ValidationPassword = function (password) {
   return bcrypte.compareSync(password, this.password);
 };

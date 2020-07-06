@@ -32,6 +32,13 @@ UserSchema.pre("save", function (next) {
   }
 });
 
+
+UserSchema.virtual('userRole',{
+  ref : 'UserRole',
+  localField : 'userRole',
+  foreignField : 'user'
+})
+
 UserSchema.methods.ValidationPassword = function (password) {
   return bcrypte.compareSync(password, this.password);
 };

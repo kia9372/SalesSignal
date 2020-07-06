@@ -14,5 +14,11 @@ RoleSchema.pre("save", function (next) {
   next();
 });
 
+RoleSchema.virtual('userRole',{
+  ref : 'UserRole',
+  localField : 'userRole',
+  foreignField : 'role'
+})
+
 
 module.exports = mongoose.model("Roles", RoleSchema);
