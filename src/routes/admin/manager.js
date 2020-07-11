@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const ManagerController = require("../../http/controller/ManagerController");
 const ManagerValidation = require("../../http/validation/manager/manager");
-const UploadAvatar = require("../../utilitie/avatarUpload");
+const UploadAvatar = require("../../utilitie/Multer/avatarUpload");
 const fileHandlerToField=require('../../http/middlware/FileToField');
 
 router.post(
@@ -23,6 +23,11 @@ router.put(
     "/updateAccountInfo/:id",
     ManagerValidation.EditAccountInfoHandle(),
     ManagerController.EditAccountInfoManager
+  );
+
+  router.put(
+    "/ChangeRole/:id",
+    ManagerController.ChangeManagerRole
   );
 
 router.delete("/delete/:id", ManagerController.DeleteManager);
@@ -57,9 +62,14 @@ router.get(
     ManagerController.GetAccountInfo
   );
 
-  router.get(
+  router.post(
     "/getAll",
     ManagerController.GetAllManagers
+  );
+
+  router.get(
+    "/GetManagerImage/:id",
+    ManagerController.GetManagerImage
   );
 
 // router.get('/get/:id',ManagerController.GetRoleById);

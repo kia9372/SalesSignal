@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const UserController = require("../../http/controller/UserController");
 const UserValidation = require("../../http/validation/user/UserValidation");
-const UploadAvatar = require("../../utilitie/avatarUpload");
+const UploadAvatar = require("../../utilitie/Multer/avatarUpload");
 const fileHandlerToField=require('../../http/middlware/FileToField');
 
 router.post(
@@ -23,6 +23,11 @@ router.put(
     "/updateAccountInfo/:id",
     UserValidation.EditAccountInfoHandle(),
     UserController.EditAccountInfoUser
+  );
+
+  router.put(
+    "/ChangeRole/:id",
+    UserController.ChangeUserRole
   );
 
 router.delete("/delete/:id", UserController.DeleteUser);
@@ -47,20 +52,24 @@ router.put(
   UserController.ResetPassword
 );
 
-
 router.get(
-  "/personalInformation/:id",
-  UserController.GetPersonalInfo
-);
+    "/personalInformation/:id",
+    UserController.GetPersonalInfo
+  );
 
-router.get(
-  "/accountInformation/:id",
-  UserController.GetAccountInfo
-);
+  router.get(
+    "/accountInformation/:id",
+    UserController.GetAccountInfo
+  );
 
-router.get(
-  "/getAll",
-  UserController.GetAllUsers
-);
+  router.post(
+    "/getAll",
+    UserController.GetAllUsers
+  );
+
+  router.get(
+    "/GetManagerImage/:id",
+    UserController.GetUserImage
+  );
 
 module.exports = router;

@@ -87,4 +87,19 @@ module.exports = new (class RoleController extends BaseController {
     }
     return this.BadRerquest(res, validationData[1]);
   }
+
+    /***
+   * Get Role For Select
+   */
+  async GetRolesSelect(req, res, next) {
+    let validationData = await this.ValidationAction(req, res);
+    if (validationData[0]) {
+      let role = await Role.find({}).where("isDelete").equals(false).select('name description');
+      if (role) {
+        return this.OkObjectResultPager(res, role,await Role.count().where('isDelete').equals(false));
+      }
+      return this.Notfound(res);
+    }
+    return this.BadRerquest(res, validationData[1]);
+  }
 })();

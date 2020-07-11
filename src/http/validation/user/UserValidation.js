@@ -1,12 +1,16 @@
 const { check } = require("express-validator");
 const path = require("path");
-const User = require("../../../entity/user");
+const User = require("../../../entity/manager");
 const { throws } = require("assert");
 
 module.exports = new (class UserValidation {
   CreateHandle() {
     return [
       check("name").notEmpty().withMessage("نام کاربر نمیتواند خالی باشد"),
+      check("gender").notEmpty().withMessage("جنسیت نمیتواند خالی باشد"),
+      check("isWriter")
+        .notEmpty()
+        .withMessage("نوع کاربر که نویسنده است یا نه باید مشخص شود"),
       check("family")
         .notEmpty()
         .withMessage("نام خانوادگی کاربر نمیتواند خالی باشد"),
@@ -20,6 +24,7 @@ module.exports = new (class UserValidation {
             }
           });
         })
+        .withMessage("نام کاربری نمیتواند نکراری باشد")
         .notEmpty()
         .withMessage("نام کاربری نمیتواند خالی باشد"),
       check("password")
@@ -30,7 +35,7 @@ module.exports = new (class UserValidation {
       check("phoneNumber")
         .custom((value) => {
           return User.find({ phoneNumber: value }).then((user) => {
-              console.log(user)
+            console.log(user);
             if (user.length > 0) {
               return Promise.reject(
                 " شماره تلفن وارد شده تکراری است . لطفا یک  شماره تلفن دیگر وارد کنید"
@@ -38,6 +43,7 @@ module.exports = new (class UserValidation {
             }
           });
         })
+        .withMessage(" شماره تلفن نمیتواند نکراری باشد")
         .notEmpty()
         .withMessage("شماره تلفن کاربر نمیتواند خالی باشد"),
     ];
@@ -46,26 +52,23 @@ module.exports = new (class UserValidation {
   EditHandle() {
     return [
       check("name").notEmpty().withMessage("نام کاربر نمیتواند خالی باشد"),
-      check("family")
-        .notEmpty()
-        .withMessage("نام خانوادگی کاربر نمیتواند خالی باشد"),
-      check("userName")
+      check("phoneNumber")
         .custom((value, { req }) => {
-          return User.find({ userName: value }).then((user) => {
+          return User.find({ phoneNumber: value }).then((user) => {
             if (user.length > 0) {
-              console.log(req.params.id, user[0]._id);
-              if (value === user[0].userName && req.params.id != user[0]._id) {
+              if (value === user[0].phoneNumber && req.params.id != user[0]._id)
                 return Promise.reject(
-                  "نام کاربری وارد شده تکراری است . لطفا یک نام کاربری دیگر وارد کنید"
+                  " شماره تلفن وارد شده تکراری است . لطفا یک  شماره تلفن دیگر وارد کنید"
                 );
-              } else {
-                return;
-              }
             }
           });
         })
         .notEmpty()
-        .withMessage("نام کاربری نمیتواند خالی باشد"),
+        .withMessage(" شماره تلفن  نمیتواند خالی باشد"),
+      check("gender").notEmpty().withMessage("جنسیت نمیتواند خالی باشد"),
+      check("family")
+        .notEmpty()
+        .withMessage("نام خانوادگی کاربر نمیتواند خالی باشد"),
       check("avatar").custom(async (value, { req }) => {
         if (req.file) {
           if (!value) {
@@ -83,31 +86,34 @@ module.exports = new (class UserValidation {
 
   EditAccountInfoHandle() {
     return [
-      check("phoneNumber")
+      check("userName")
         .custom((value, { req }) => {
-          return User.find({ phoneNumber: value }).then((user) => {
+          return User.find({ userName: value }).then((user) => {
             if (user.length > 0) {
-              if (value === user[0].phoneNumber && req.params.id != user[0]._id)
+              if (value === user[0].userName && req.params.id != user[0]._id)
                 return Promise.reject(
-                  " شماره تلفن وارد شده تکراری است . لطفا یک  شماره تلفن دیگر وارد کنید"
+                  "  نام کاربری وارد شده تکراری است . لطفا یک   نام کاربری دیگر وارد کنید"
                 );
             }
           });
         })
         .notEmpty()
-        .withMessage(" شماره تلفن  نمیتواند خالی باشد"),
-      check("confirmPhoneNumber")
-        .notEmpty()
-        .withMessage("  تکرار شماره تلفن نمیتواند خالی باشد")
+        .withMessage("  نام کاربری  نمیتواند خالی باشد"),
+      check("confirmuserName")
         .custom((value, { req }) => {
-          if (value != req.body.phoneNumber) {
-            throw new Error("شماره تلفن و تکرار شماره تلفن یکسان نیستند");
+          if (value) {
+            if (value != req.body.userName) {
+              throw new Error(" نام کاربری و تکرار  نام کاربری یکسان نیستند");
+            }
           }
           return true;
         }),
       check("isActive")
         .notEmpty()
         .withMessage(" وضعیت فعال بودن یا نبودن کاربر با مشخص شود "),
+      check("isWriter")
+        .notEmpty()
+        .withMessage("نوع کاربر که نویسنده است یا نه باید مشخص شود")
     ];
   }
 

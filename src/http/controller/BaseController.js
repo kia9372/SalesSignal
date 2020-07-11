@@ -48,6 +48,18 @@ module.exports = class BaseController {
     });
   }
 
+  OkObjectResultPager(res, value, count) {
+    return res.status(200).send({
+      message: "عملیات با موفقیت انجام شد",
+      data: {
+        records: value,
+        totalCount: count,
+      },
+      statusCode: 200,
+      success: true,
+    });
+  }
+
   async ValidationAction(req, res) {
     const result = await validationResult(req);
     if (!result.isEmpty()) {

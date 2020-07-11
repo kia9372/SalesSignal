@@ -14,4 +14,6 @@ router.get('/get/:id',RoleController.GetRoleById);
 
 router.get('/getall',RoleController.GetAllRoles);
 
+router.get('/GetRoleSelected',RoleController.GetAllRoles);
+
 module.exports=router;

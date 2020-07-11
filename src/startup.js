@@ -3,10 +3,12 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const path=require('path');
 const methodOverride = require("method-override");
 const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);
 const cookieParser = require("cookie-parser");
+var cors = require("cors");
 
 module.exports = class Startup {
   constructor() {
@@ -38,7 +40,9 @@ module.exports = class Startup {
      Config Site Optional 
      **/
   SiteConfiguration() {
+    app.use(cors());
     app.use(bodyParser.json());
+    app.use(express.static(path.join(__dirname, "public")));
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(
       session({

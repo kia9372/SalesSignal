@@ -10,9 +10,9 @@ module.exports = new (class AuthRepository {
         if (user) {
           if (user.ValidationPassword(password)) {
             if (!user.isActive) {
-              return ["حساب کاربری شما فعال نیست", null, false, 400];
+              return ["حساب کاربری شما فعال نیست", null, false, 200];
             } else if (user.isDelete) {
-              return ["کاربری با چنین مشخصاتی یافت نشد", null, false, 400];
+              return ["کاربری با چنین مشخصاتی یافت نشد", null, false, 200];
             } else if (user.locked) {
               let date_ob = new Date();
               if (user.lockedDate < new Date(new Date().toUTCString())) {
@@ -45,26 +45,26 @@ module.exports = new (class AuthRepository {
                   "نام کاربری یا رمز عبور شما اشتباه است",
                   null,
                   false,
-                  400,
+                  200,
                 ];
               });
               return [
                 "نام کاربری یا رمز عبور شما اشتباه است",
                 null,
                 false,
-                400,
+                200,
               ];
             } else {
               user.locked = true;
               user.lockedDate = new Date().setUTCHours(72);
               user.save(() => {
-                return ["حساب کاربری شما بلاک شده است", null, false, 400];
+                return ["حساب کاربری شما بلاک شده است", null, false, 200];
               });
-              return ["حساب کاربری شما بلاک شده است", null, false, 400];
+              return ["حساب کاربری شما بلاک شده است", null, false, 200];
             }
           }
         } else {
-          return ["کاربری با چنین مشخصاتی یافت نشد", null, false, 400];
+          return ["کاربری با چنین مشخصاتی یافت نشد", null, false, 200];
         }
       });
   }

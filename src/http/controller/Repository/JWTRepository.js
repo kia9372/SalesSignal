@@ -7,12 +7,13 @@ module.exports = new (class JWTRepository {
         iss: "a57bb14a44455e98800d6a513953fc0",
         sub: "a57bb14a445541e98800d6a513953fc0",
         aud: "SalesSignal.com",
-        exp: Math.floor(Date.now() / 1000) + 300,
-        iat: Math.floor(Date.now() / 1000)
+        expiresIn:.6,
+        iat:.6
       };
     return jwt.sign(
-      { foo: await UserRepository.GetLoginUserInfo(userName),payload },
-      "shhhhh"
+      { info: await UserRepository.GetLoginUserInfo(userName),payload },
+      "shhhhh",
+      {expiresIn:60*24}
     );
   }
 })();

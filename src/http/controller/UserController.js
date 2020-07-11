@@ -1,5 +1,5 @@
 const BaseController = require("./BaseController");
-const User = require("../../entity/user");
+const Manager = require("../../entity/manager");
 const fs = require("fs");
 const settingRepository = require("./Repository/SettingRepository");
 const Utilite = require("../../utilitie/utility");
@@ -13,22 +13,23 @@ module.exports = new (class UserController extends BaseController {
   async CreateUser(req, res, next) {
     let result = await this.ValidationAction(req, res);
     if (result[0]) {
-      const user = new User({ ...req.body });
+      const user = new Manager({ ...req.body });
+      user.isAdmin=false;
       user.save((error, user) => {
         settingRepository
           .GetSetting(settingEnum.REGISTER_SETTING)
           .then((setting) => {
             let userRole = new UserRole({
-              role: setting.adminRegister,
+              role: setting.userRegister,
               user: user._id,
             });
             userRole.save();
           });
       });
-
       return this.Ok(res);
+    } else {
+      return this.BadRerquest(res, result[1]);
     }
-    return this.BadRerquest(res, result[1]);
   }
   /***
    * Edit User
@@ -36,44 +37,66 @@ module.exports = new (class UserController extends BaseController {
   async EditUser(req, res, next) {
     let result = await this.ValidationAction(req, res);
     if (result[0]) {
-      const user = await User.findById(req.params.id);
-      user.userName = req.body.userName;
+      let user = await Manager.findById(req.params.id);
       user.name = req.body.name;
+      user.gender = req.body.gender;
+      user.phoneNumber = req.body.phoneNumber;
       user.family = req.body.family;
       user.avatar = req.file
         ? Utilite.getDirectoryImage(
             `${req.file.destination}/${req.file.originalname}`
           )
-        : null;
+        : user.avatar;
 
       user.save();
       return this.Ok(res);
+    } else {
+      return this.BadRerquest(res, result[1]);
     }
-    return this.BadRerquest(res, result[1]);
   }
-
-    /***
+  /***
+   * Change User Role
+   */
+  async ChangeUserRole(req, res, next) {
+    let result = await this.ValidationAction(req, res);
+    if (result[0]) {
+      let user = await UserRole.find({ user: req.body.id });
+      if (user.length <= 0) return this.Notfound(res);
+      user[0].role = req.body.roleId;
+      user[0].save((err, userRole) => {
+        Manager.findById(userRole.user).then((user) => {
+          user.save();
+        });
+      });
+      return this.Ok(res);
+    } else {
+      return this.BadRerquest(res, result[1]);
+    }
+  }
+  /***
    * Edit Account Info
    */
   async EditAccountInfoUser(req, res, next) {
     let result = await this.ValidationAction(req, res);
     if (result[0]) {
-      let user = await User.findById(req.params.id);
-      user.phoneNumber = req.body.phoneNumber;
+      let user = await Manager.findById(req.params.id);
+      user.userName = req.body.userName;
       user.isActive = req.body.isActive;
-
+      user.isWriter = req.body.isWriter;
+      console.log(req.body);
       user.save();
       return this.Ok(res);
+    }else{
+      return this.BadRerquest(res, result[1]);
     }
-    return this.BadRerquest(res, result[1]);
   }
   /***
-   * Change PhoneNumber User
+   * Change PhoneNumber Manager
    */
   async ChangePhoneNumber(req, res, next) {
     const result = await this.ValidationAction(req, res);
     if (result[0]) {
-      await User.findById(req.params.id).then((user) => {
+      await Manager.findById(req.params.id).then((user) => {
         if (!user) return this.Notfound(res);
         user.phoneNumber = req.body.phoneNumber;
         user.save();
@@ -82,19 +105,19 @@ module.exports = new (class UserController extends BaseController {
     }
     return this.BadRerquest(res, result[1]);
   }
+
   /***
-   * Delete User
+   * Delete Manager
    */
   async DeleteUser(req, res, next) {
     let result = await this.ValidationAction(req, res);
     if (result[0]) {
-      const user = User.findByIdAndUpdate(
+      const user = Manager.findByIdAndUpdate(
         req.params.id,
         { $set: { isDelete: true } },
         { useFindAndModify: false },
         (error, user) => {
           if (error) {
-            console.log(error);
             next(error);
           } else if (!user) {
             return this.Notfound(res);
@@ -103,16 +126,17 @@ module.exports = new (class UserController extends BaseController {
           }
         }
       );
+    } else {
+      return this.BadRerquest(res, result[1]);
     }
-    return this.BadRerquest(res, result[1]);
   }
   /***
-   * ChangeUserActivation
+   * ChangeManagerActivation
    */
   async ChangeUserActivation(req, res, next) {
     let result = await this.ValidationAction(req, res);
     if (result[0]) {
-      const user = User.findByIdAndUpdate(req.params.id).then((user) => {
+      const user = Manager.findByIdAndUpdate(req.params.id).then((user) => {
         if (!user) return this.Notfound(res);
         user.isActive = !user.isActive;
         user.save((err) => {
@@ -129,7 +153,7 @@ module.exports = new (class UserController extends BaseController {
   async ChangePassword(req, res, next) {
     const result = await this.ValidationAction(req, res);
     if (result[0]) {
-      await User.findById(req.params.id).then((user) => {
+      await Manager.findById(req.params.id).then((user) => {
         if (!user) return this.Notfound(res);
         Utilite.HashField(req.body.password).then((hash) => {
           user.password = hash;
@@ -146,10 +170,10 @@ module.exports = new (class UserController extends BaseController {
   async ResetPassword(req, res, next) {
     const result = await this.ValidationAction(req, res);
     if (result[0]) {
-      await User.find({ userName: req.body.userName }).then((user) => {
+      await Manager.find({ userName: req.body.userName }).then((user) => {
         if (!user) return this.Notfound(res);
         Utilite.HashField(req.body.password).then((hash) => {
-          user.password=hash;
+          console.log("in controller", hash);
         });
         user.save();
       });
@@ -157,44 +181,95 @@ module.exports = new (class UserController extends BaseController {
     }
     return this.BadRerquest(res, result[1]);
   }
-    /***
+  /***
    * Get Personal Info
    */
   async GetPersonalInfo(req, res, next) {
-    const user = await User.findById(req.params.id)
+    const manager = await Manager.findById(req.params.id)
+      .populate("userRole", "role")
       .where("isDelete")
       .equals(false)
       .where("isAdmin")
       .equals(false)
-      .select(" name family userName");
-    if (!user) return this.Notfound(res);
-    return this.OkObjectResult(res, user);
+      .select(" name family gender phoneNumber");
+    if (!manager) return this.Notfound(res);
+    return this.OkObjectResult(res, manager);
   }
   /***
    * Get Account Info
    */
   async GetAccountInfo(req, res, next) {
-    const user = await User.findById(req.params.id)
+    const manager = await Manager.findById(req.params.id)
       .where("isDelete")
       .equals(false)
       .where("isAdmin")
       .equals(false)
-      .select(" phoneNumber isActive");
-    if (!user) return this.Notfound(res);
-    return this.OkObjectResult(res, user);
+      .select(" userName isWriter isActive");
+    if (!manager) return this.Notfound(res);
+    return this.OkObjectResult(res, manager);
   }
-
-   /***
-   * Get All Users
+  /***
+   * Get All Managers
    */
   async GetAllUsers(req, res, next) {
-    const user = await User.find({})
-      .where("isDelete")
-      .equals(false)
+    let filresValue = [];
+    let manag = Manager.find({});
+    let filters = JSON.parse(req.body.filters);
+    let sortField = req.body.sidx;
+    let sortValue = `{${sortField}:${req.body.sort}}`;
+
+    if (filters) {
+      filters.forEach((element) => {
+        if (element["op"] === "eq") {
+          manag.where(element["field"]).equals(element["data"]);
+        } else if (element["op"] === "gte") {
+          let f = element["field"];
+          manag.find({ f: { $gte: element["data"] } });
+        } else if (element["op"] === "lte") {
+          manag.find({ field: { $lte: element["data"] } });
+        } else if (element["op"] === "cn") {
+          manag.find({ userName: { $regex: `(.*)${element["data"]}(.*)` } });
+        }
+      });
+    }
+
+    const manager = await manag
+      .select("name family userName phoneNumber displayName isActive")
       .where("isAdmin")
       .equals(false)
-      .select("name family userName isActive");
-    if (!user) return this.Notfound(res);
-    return this.OkObjectResult(res, user);
+      .where("isWriter")
+      .equals(false)
+      .where("isDelete")
+      .equals(false)
+      .skip((req.body.page - 1) * req.body.rows)
+      .limit(req.body.rows)
+      .sort(`{${sortField}:${req.body.sort}}`);
+    if (!manager) return this.Notfound(res);
+    return this.OkObjectResultPager(
+      res,
+      manager,
+      await Manager.countDocuments()
+        .where("isAdmin")
+        .equals(false)
+        .where("isWriter")
+        .equals(false)
+        .where("isDelete")
+        .equals(false)
+    );
+  }
+
+    /***
+   * GetManagerImage
+   */
+  async GetUserImage(req, res, next) {
+    let manager = await Manager.findById(req.params.id).select("avatar");
+    if (!manager.avatar) {
+      return this.Notfound(res);
+    }
+    fs.readFile(`./src/public${manager.avatar}`,(error,data)=>{
+      if (error) throw err;
+      res.writeHead(200, {'Content-Type': 'image/png'})
+      res.end(data) // Send the file data to the browser.
+    })
   }
 })();
