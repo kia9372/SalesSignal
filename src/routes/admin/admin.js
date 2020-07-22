@@ -1,30 +1,34 @@
-const express=require('express');
-const router=express.Router();
-const roleRouter=require('./role');
-const userRouter=require('./user');
-const managerRouter=require('./manager');
-const accessRouter=require('./access');
-const settingRouter=require('./setting');
-const categoryRouter=require('./category');
-const generRouter=require('./gener');
-const signerRouter=require('./signer');
+const express = require("express");
+const router = express.Router();
+const roleRouter = require("./role");
+const userRouter = require("./user");
+const managerRouter = require("./manager");
+const accessRouter = require("./access");
+const settingRouter = require("./setting");
+const categoryRouter = require("./category");
+const generRouter = require("./gener");
+const signerRouter = require("./signer");
+const songRouter = require("./song");
+const albumRouter = require("./album");
 
+router.use("/role", roleRouter);
 
+router.use("/user", userRouter);
 
-router.use('/role',roleRouter);
+router.use("/manager", managerRouter);
 
-router.use('/user',userRouter);
+router.use("/category", categoryRouter);
 
-router.use('/manager',managerRouter);
+router.use("/permission", accessRouter);
 
-router.use('/category',categoryRouter);
+router.use("/gener", generRouter);
 
-router.use('/access',accessRouter);
+router.use("/signer", signerRouter);
 
-router.use('/gener',generRouter);
+router.use("/song", songRouter);
 
-router.use('/signer',signerRouter);
+router.use("/album", albumRouter);
 
-router.use('/setting',settingRouter);
+router.use("/setting", settingRouter);
 
-module.exports=router;
+module.exports = router;

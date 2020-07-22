@@ -5,7 +5,7 @@ const adminRouter=require('./admin/admin');
 const authRouter=require('./auth/auth');
 
 
-router.use('/admin',ahtMiddlware.AuthToken,adminRouter);
+router.use('/admin',adminRouter);
 
 router.use('/auth',authRouter);
 

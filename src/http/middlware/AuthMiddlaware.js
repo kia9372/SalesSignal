@@ -7,12 +7,9 @@ class Auth extends middlware {
   async AuthToken(req, res, next) {
     let allow = true;
 
-    let auth = jwt.verify(req.headers["authorization"], "shhhhh", function (
-      err,
-      decoded
-    ) {
+    jwt.verify(req.headers["authorization"], "shhhhh", (err, decoded) => {
       if (err) {
-        if (err.expiredAt) {
+        if (err) {
           allow = false;
         }
       } else {
@@ -21,12 +18,14 @@ class Auth extends middlware {
           console.log(decoded.info.userRole[0]);
           if (user.scurityStamp != decoded.info.scurityStamp) {
             allow = false;
+            console.log(allow);
           }
           if (
             user.userRole[0].role.scurityStamp !=
             decoded.info.userRole[0].role.scurityStamp
           ) {
             allow = false;
+            console.log(allow);
           }
         });
       }

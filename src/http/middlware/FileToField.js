@@ -29,19 +29,55 @@ class FileToField extends middlware {
   }
 
   FileToSignerPoster(req, res, next) {
-    if (!req.file) {
+    if (!req.files.signerPoster) {
       req.body.signerPoster = undefined;
     } else {
-      req.body.signerPoster = req.file.originalname;
+      req.body.signerPoster = req.files.signerPoster.originalname;
     }
     next();
   }
 
   FileToSignerProfle(req, res, next) {
-    if (!req.file) {
+    if (!req.files.signerProfile) {
       req.body.signerProfile = undefined;
     } else {
-      req.body.signerProfile = req.file.originalname;
+      req.body.signerProfile = req.files.signerProfile.originalname;
+    }
+    next();
+  }
+
+  FileToSongPoster(req, res, next) {
+    if (!req.files.songPoster) {
+      req.body.songPoster = undefined;
+    } else {
+      req.body.songPoster = req.files.songPoster.originalname;
+    }
+    next();
+  }
+
+  FileToSongFile(req, res, next) {
+    if (!req.files.songFile) {
+      req.body.songFile = undefined;
+    } else {
+      req.body.songFile = req.files.songFile.originalname;
+    }
+    next();
+  }
+
+  FileToAlbumPoster(req, res, next) {
+    if (!req.files.albumPoster) {
+      req.body.albumPoster = undefined;
+    } else {
+      req.body.albumPoster = req.files.albumPoster.originalname;
+    }
+    next();
+  }
+
+  FileToAlbumProFile(req, res, next) {
+    if (!req.files.albumeProfile) {
+      req.body.albumeProfile = undefined;
+    } else {
+      req.body.albumeProfile = req.files.albumeProfile.originalname;
     }
     next();
   }

@@ -57,7 +57,7 @@ module.exports = new (class SignerValidation {
         if (req.method === "PUT" && value === undefined) return;
 
         if (!value) {
-          throw new Error("عکس \,sjv  را وارد کنید");
+          throw new Error("عکس پوستر خواننده  را وارد کنید");
         } else {
           const fileExe = [".png", ".jpg", ".jepg", ".svg"];
           if (!fileExe.includes(path.extname(value).toLowerCase())) {
@@ -70,7 +70,7 @@ module.exports = new (class SignerValidation {
         if (req.method === "PUT" && value === undefined) return;
 
         if (!value) {
-          throw new Error("عکس پروفایل  را وارد کنید");
+          throw new Error("عکس  پروفایل  رخواننده ا وارد کنید");
         } else {
           const fileExe = [".png", ".jpg", ".jepg", ".svg"];
           if (!fileExe.includes(path.extname(value).toLowerCase())) {

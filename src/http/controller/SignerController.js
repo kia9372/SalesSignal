@@ -12,10 +12,10 @@ module.exports = new (class SignerController extends BaseController {
       const signer = new Signer({
         name: req.body.name,
         signerPoster: Utilite.getDirectoryImage(
-          `${req.file.destination}/${req.file.originalname}`
+          `${req.files.signerPoster[0].destination}/${req.files.signerPoster[0].originalname}`
         ),
         signerProfile: Utilite.getDirectoryImage(
-          `${req.file.destination}/${req.file.originalname}`
+          `${req.files.signerProfile[0].destination}/${req.files.signerProfile[0].originalname}`
         ),
         gener: req.body.gener,
       });
@@ -55,14 +55,14 @@ module.exports = new (class SignerController extends BaseController {
     if (validationData[0]) {
       let signer = await Signer.findById(req.params.id);
       signer.name = req.body.name;
-      signer.signerPoster = req.file
+      signer.signerPoster = req.files.signerPoster
         ? Utilite.getDirectoryImage(
-            `${req.file.destination}/${req.file.originalname}`
+          `${req.files.signerPoster[0].destination}/${req.files.signerPoster[0].originalname}`
           )
         : signer.signerPoster;
-      signer.signerProfile = req.file
+      signer.signerProfile = req.files.signerProfile
         ? Utilite.getDirectoryImage(
-            `${req.file.destination}/${req.file.originalname}`
+          `${req.files.signerProfile[0].destination}/${req.files.signerProfile[0].originalname}`
           )
         : signer.signerProfile;
 
@@ -114,7 +114,8 @@ module.exports = new (class SignerController extends BaseController {
     }
 
     let role = await signer
-      .find({})
+    .find({})
+    .populate('gener','name')
       .where("isDelete")
       .equals(false)
       .skip((req.body.page - 1) * req.body.rows)
